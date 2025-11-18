@@ -28,12 +28,19 @@ class YFinanceDataFeed(DataFeed):
         self.end = end
 
     def iter_bars(self):
-        df = yf.download(
-            self.symbol,
-            start=self.start,
-            end=self.end,
-            auto_adjust=True  # 用复权后的价格，避免分红拆股把曲线搞断
-        )
+        try:
+            df = yf.download(
+                self.symbol,
+                start=self.start,
+                end=self.end,
+                auto_adjust=True  # 用复权后的价格，避免分红拆股把曲线搞断
+            )
+            if df.empty:
+                print(f"No data downloaded for {self.symbol} from {self.start} to {self.end}. Check symbol and date range.")
+                return
+        except Exception as e:
+            print(f"Error downloading data for {self.symbol}: {e}")
+            return
 
         # 确保按时间排序
         df = df.sort_index()

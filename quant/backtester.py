@@ -4,7 +4,6 @@ import numpy as np
 import pandas as pd
 
 from .data import DataFeed, Bar
-from .strategy import Strategy, SimpleDCAState
 
 class Backtester:
     def __init__(self, fee_rate: float = 0.0005, slippage: float = 0.0005):
@@ -12,14 +11,14 @@ class Backtester:
         self.fee_rate = fee_rate
         self.slippage = slippage
 
-    def run(self, data_feed: DataFeed, strategy: Strategy, initial_capital: float = 100_000):
+    def run(self, data_feed: DataFeed, strategy, initial_state, initial_capital: float = 100_000):
         cash = initial_capital
         position_shares = 0.0
         equity_curve = []
         dates = []
         trades = []
 
-        state = SimpleDCAState()
+        state = initial_state
         last_price = None
 
         for bar in data_feed.iter_bars():

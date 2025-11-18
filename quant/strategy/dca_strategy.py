@@ -1,9 +1,8 @@
 # quant/strategy.py
 
-from .data import Bar
+from ..data import Bar
 from collections import deque
 import numpy as np
-from .data import Bar
 
 class Strategy:
     def on_bar(self, bar: Bar, state):

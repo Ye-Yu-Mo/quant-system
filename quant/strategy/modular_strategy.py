@@ -6,6 +6,7 @@ import pandas as pd
 from typing import Optional
 
 from ..data import Bar
+from .base import Strategy
 
 # State object for the advanced strategy
 class AdvancedStrategyState:
@@ -95,25 +96,26 @@ class SimplePositionSizer(PositionSizer):
         self.step = step
 
     def calculate_target_position(self, current_position: float, signals: dict[str, Signal]) -> float:
-        # Check volatility filter first, if provided
+        # 过滤器拥有一票否决权
         if self.vol_filter_name:
             vol_filter_signal = signals.get(self.vol_filter_name)
-            if vol_filter_signal and not vol_filter_signal.value:
-                # If volatility is too high, do not change position
+            if vol_filter_signal is not None and not vol_filter_signal.value:
+                # 波动率过高，停止任何操作，保持当前仓位
                 return current_position
 
+        # 如果过滤器未否决，则执行动量逻辑
         momentum = signals[self.momentum_signal_name].value
         
-        # Adjust position based on momentum signal
-        if momentum > 0: # Price is above MA
+        if momentum > 0:  # 价格高于均线
             return min(1.0, current_position + self.step)
-        elif momentum < 0: # Price is below MA
+        elif momentum < 0:  # 价格低于均线
             return max(0.0, current_position - self.step)
         
+        # 动量信号中性，保持仓位
         return current_position
 
 # The main strategy class that combines everything
-class AdvancedStrategy:
+class AdvancedStrategy(Strategy):
     def __init__(self, features: dict[str, Feature], signals: dict[str, Signal], position_sizer: PositionSizer):
         self.features = features
         self.signals = signals

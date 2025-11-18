@@ -1,18 +1,10 @@
-# quant/strategy.py
-
-from ..data import Bar
 from collections import deque
 import numpy as np
 
-class Strategy:
-    def on_bar(self, bar: Bar, state):
-        """
-        根据当前 bar + 内部状态
-        返回 (目标仓位比例, 新状态)
-        目标仓位比例通常在 0.0 ~ 1.0 之间
-        """
-        raise NotImplementedError
-    
+from ..data import Bar
+from .base import Strategy
+
+
 class SimpleDCAState:
     def __init__(self, window: int = 20):
         self.window = window
